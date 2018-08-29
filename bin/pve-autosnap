@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# pve-autosnap - Copyright (c) 2018 - Olivier Poncet
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+
+QM="/usr/sbin/qm"
+
+# ----------------------------------------------------------------------------
+# parse command-line
+# ----------------------------------------------------------------------------
+
+if [ "x${1}y" = "xhelpy" ]
+then
+    echo "Usage: pve-autosnap <vmid> [<keep>]"
+    exit 0
+fi
+
+if [ "x${1}y" != "xy" ]
+then
+    opt_vmid="${1}"
+else
+    opt_vmid="0"
+fi
+
+if [ "x${2}y" != "xy" ]
+then
+    opt_keep="${2}"
+else
+    opt_keep="1"
+fi
+
+if [ "x$(${QM} status ${opt_vmid} 2>/dev/null)y" = "xy" ]
+then
+    echo "error: <vmid> does not look like a valid VM ID"
+    exit 1
+fi
+
+# ----------------------------------------------------------------------------
+# configuration
+# ----------------------------------------------------------------------------
+
+AUTOSNAP_VMID="${opt_vmid}"
+AUTOSNAP_KEEP="${opt_keep}"
+AUTOSNAP_NAME="autosnap_$(date '+%Y%m%d_%H%M%S')"
+AUTOSNAP_DESC="automatic snapshot"
+AUTOSNAP_LIST="$(${QM} listsnapshot "${AUTOSNAP_VMID}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+
+# ----------------------------------------------------------------------------
+# delete old snapshots
+# ----------------------------------------------------------------------------
+
+AUTOSNAP_LEFT="$(echo "${AUTOSNAP_LIST}" | wc -w)"
+for AUTOSNAP_ITEM in ${AUTOSNAP_LIST}
+do
+    if [ "${AUTOSNAP_LEFT}" -ge "${AUTOSNAP_KEEP}" ]
+    then
+        ${QM} delsnapshot "${AUTOSNAP_VMID}" "${AUTOSNAP_ITEM}"
+    fi
+    AUTOSNAP_LEFT=$((AUTOSNAP_LEFT - 1))
+done
+
+# ----------------------------------------------------------------------------
+# create new snapshot
+# ----------------------------------------------------------------------------
+
+${QM} snapshot "${AUTOSNAP_VMID}" "${AUTOSNAP_NAME}" -description "${AUTOSNAP_DESC}"
+
+# ----------------------------------------------------------------------------
+# End-Of-File
+# ----------------------------------------------------------------------------
