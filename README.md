@@ -2,10 +2,10 @@
 
 ## Usage
 
-Usage: pve-autosnap <vmid> [<keep>]
+Usage: pve-autosnap [help] <vmid> [<keep>]
 
   - <vmid> specifies the virtual machine id
-  - <keep> specifies the maximum number of snapshot to keep
+  - <keep> specifies the maximum number of snapshot to keep (default is 1)
 
 ## License
 
