@@ -16,23 +16,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
+# ----------------------------------------------------------------------------
+# qm interface definitions
+# ----------------------------------------------------------------------------
+
 QM="/usr/sbin/qm"
+QM_SELECT="listsnapshot"
+QM_CREATE="snapshot"
+QM_DELETE="delsnapshot"
 
 # ----------------------------------------------------------------------------
 # parse command-line
 # ----------------------------------------------------------------------------
 
-if [ "x${1}y" = "xhelpy" ]
-then
-    echo "Usage: pve-autosnap <vmid> [<keep>]"
-    exit 0
-fi
-
 if [ "x${1}y" != "xy" ]
 then
     opt_vmid="${1}"
 else
-    opt_vmid="0"
+    opt_vmid="help"
 fi
 
 if [ "x${2}y" != "xy" ]
@@ -40,6 +41,12 @@ then
     opt_keep="${2}"
 else
     opt_keep="1"
+fi
+
+if [ "x${opt_vmid}y" = "xhelpy" ]
+then
+    echo "Usage: pve-autosnap [ help | <vmid> [<keep>] ]"
+    exit 0
 fi
 
 if [ "x$(${QM} status ${opt_vmid} 2>/dev/null)y" = "xy" ]
@@ -56,7 +63,7 @@ AUTOSNAP_VMID="${opt_vmid}"
 AUTOSNAP_KEEP="${opt_keep}"
 AUTOSNAP_NAME="autosnap_$(date '+%Y%m%d_%H%M%S')"
 AUTOSNAP_DESC="automatic snapshot"
-AUTOSNAP_LIST="$(${QM} listsnapshot "${AUTOSNAP_VMID}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+AUTOSNAP_LIST="$(${QM} "${QM_SELECT}" "${AUTOSNAP_VMID}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
 
 # ----------------------------------------------------------------------------
 # delete old snapshots
@@ -67,7 +74,7 @@ for AUTOSNAP_ITEM in ${AUTOSNAP_LIST}
 do
     if [ "${AUTOSNAP_LEFT}" -ge "${AUTOSNAP_KEEP}" ]
     then
-        ${QM} delsnapshot "${AUTOSNAP_VMID}" "${AUTOSNAP_ITEM}"
+        ${QM} "${QM_DELETE}" "${AUTOSNAP_VMID}" "${AUTOSNAP_ITEM}"
     fi
     AUTOSNAP_LEFT=$((AUTOSNAP_LEFT - 1))
 done
@@ -76,7 +83,7 @@ done
 # create new snapshot
 # ----------------------------------------------------------------------------
 
-${QM} snapshot "${AUTOSNAP_VMID}" "${AUTOSNAP_NAME}" -description "${AUTOSNAP_DESC}"
+${QM} "${QM_CREATE}" "${AUTOSNAP_VMID}" "${AUTOSNAP_NAME}" -description "${AUTOSNAP_DESC}"
 
 # ----------------------------------------------------------------------------
 # End-Of-File
