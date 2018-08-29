@@ -2,7 +2,7 @@
 
 ## Usage
 
-Usage: bin/pve-autosnap <vmid> [<keep>]
+Usage: pve-autosnap <vmid> [<keep>]
 
   - <vmid> specifies the virtual machine id
   - <keep> specifies the maximum number of snapshot to keep
