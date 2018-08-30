@@ -25,15 +25,22 @@ utility in order to send the resulting logs to the syslog service.
 Example:
 
 ```
-# automatic snapshot for all vm at minute 0, every 1h, and keep the last 4 snapshots
-0 * * * * /usr/local/bin/pve-autosnap all 4 2>&1 | logger -t autosnap
+# automatic snapshot for vmid #100, every 30m, and keep the last 3 snapshots
+*/30 * * * * /usr/local/bin/pve-autosnap 100 3 2>&1 | logger -t autosnap
 ```
 
 Another example:
 
 ```
-# automatic snapshot for all vm at minute 4, every 4h, and keep the last 2 snapshots
-5 */4 * * * /usr/local/bin/pve-autosnap all 2 2>&1 | logger -t autosnap
+# automatic snapshot for all vm, at minute 0, every 1h, and keep the last 2 snapshots
+0 * * * * /usr/local/bin/pve-autosnap all 2 2>&1 | logger -t autosnap
+```
+
+Yet another example:
+
+```
+# automatic snapshot for all vm, at minute 4, every 4h, and keep the last 1 snapshot
+5 */4 * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
 ```
 
 ## License
