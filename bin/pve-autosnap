@@ -26,7 +26,7 @@ QM_CREATE="snapshot"
 QM_DELETE="delsnapshot"
 
 # ----------------------------------------------------------------------------
-# parse command-line
+# parse the command-line
 # ----------------------------------------------------------------------------
 
 if [ "x${1}y" != "xy" ]
@@ -43,11 +43,45 @@ else
     opt_keep="1"
 fi
 
+# ----------------------------------------------------------------------------
+# display help
+# ----------------------------------------------------------------------------
+
 if [ "x${opt_vmid}y" = "xhelpy" ]
 then
-    echo "Usage: pve-autosnap [ help | <vmid> [<keep>] ]"
+    cat << ____EOF
+Usage: pve-autosnap [ help | <vmid> [<keep>] ]
+
+Options:
+
+    help	display this help and exit
+    vmid	specifies the virtual machine id, can be 'all' to select all VM
+    keep	specifies the maximum number of snapshot to keep (default is 1)
+
+____EOF
     exit 0
 fi
+
+# ----------------------------------------------------------------------------
+# if the given vmid is 'all', process all of them then exit
+# ----------------------------------------------------------------------------
+
+if [ "x${opt_vmid}y" = "xally" ]
+then
+    VMID_LIST="$(/usr/sbin/qm list | awk '{ print $1 }' | grep -v VMID | sort -n)"
+    for VMID in ${VMID_LIST}
+    do
+        if [ "${VMID}" -ge "100" ]
+        then
+            ${0} "${VMID}" ${opt_keep}
+        fi
+    done
+    exit 0
+fi
+
+# ----------------------------------------------------------------------------
+# if the given vmid seems to be a vmid, check if this is a valid vmid
+# ----------------------------------------------------------------------------
 
 if [ "x$(${QM} status ${opt_vmid} 2>/dev/null)y" = "xy" ]
 then
@@ -56,7 +90,7 @@ then
 fi
 
 # ----------------------------------------------------------------------------
-# configuration
+# prepare the vmid snapshoting
 # ----------------------------------------------------------------------------
 
 AUTOSNAP_VMID="${opt_vmid}"
@@ -66,7 +100,7 @@ AUTOSNAP_DESC="automatic snapshot"
 AUTOSNAP_LIST="$(${QM} "${QM_SELECT}" "${AUTOSNAP_VMID}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
 
 # ----------------------------------------------------------------------------
-# delete old snapshots
+# delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
 AUTOSNAP_LEFT="$(echo "${AUTOSNAP_LIST}" | wc -w)"
@@ -80,7 +114,7 @@ do
 done
 
 # ----------------------------------------------------------------------------
-# create new snapshot
+# create new snapshot for this vmid
 # ----------------------------------------------------------------------------
 
 ${QM} "${QM_CREATE}" "${AUTOSNAP_VMID}" "${AUTOSNAP_NAME}" -description "${AUTOSNAP_DESC}"

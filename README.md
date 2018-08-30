@@ -12,7 +12,7 @@ automatic snapshots with rolling snapshot feature.
 *Options:*
 
   - `help`	display help and exit
-  - `vmid`	specifies the virtual machine id
+  - `vmid`	specifies the virtual machine id, can be `all`
   - `keep`	specifies the maximum number of snapshot to keep (default is 1)
 
 ## Automated snapshots
@@ -22,16 +22,16 @@ To add a periodic task to perform automated snapshots, just edit your crontab.
 It is recommended to redirect stderr to stdout and pipe the result to the `logger`
 utility in order to send the resulting logs to the syslog service.
 
-Example to perform automatic snapshot at minute 0 each hour.
+Example to perform automatic snapshot at minute 0 each hour and keep only one snapshot:
 
 ```
-0 * * * * /root/bin/pve-autosnap-all 2>&1 | logger -t autosnap
+0 * * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
 ```
 
-Another example to perform automatic snapshot at minute 0 every 4th hour.
+Example to perform automatic snapshot at minute 0 every 4h and keep only one snapshot:
 
 ```
-0 */4 * * * /root/bin/pve-autosnap-all 2>&1 | logger -t autosnap
+0 */4 * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
 ```
 
 ## License
