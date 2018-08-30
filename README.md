@@ -1,11 +1,38 @@
 # Simple Proxmox VE automatic snapshot
 
+## Description
+
+`pve-autosnap` is an utility script for Proxmox VE hypervisor that help to perform
+automatic snapshots with rolling snapshot feature.
+
 ## Usage
 
-Usage: pve-autosnap [ help | <vmid> [<keep>] ]
+*Usage*: `pve-autosnap [ help | vmid [ keep ] ]`
 
-  - <vmid> specifies the virtual machine id
-  - <keep> specifies the maximum number of snapshot to keep (default is 1)
+*Options:*
+
+  - `help`	display help and exit
+  - `vmid`	specifies the virtual machine id
+  - `keep`	specifies the maximum number of snapshot to keep (default is 1)
+
+## Automated snapshots
+
+To add a periodic task to perform automated snapshots, just edit your crontab.
+
+It is recommended to redirect stderr to stdout and pipe the result to the `logger`
+utility in order to send the resulting logs to the syslog service.
+
+Example to perform automatic snapshot at minute 0 each hour.
+
+```
+0 * * * * /root/bin/pve-autosnap-all 2>&1 | logger -t autosnap
+```
+
+Another example to perform automatic snapshot at minute 0 every 4th hour.
+
+```
+0 */4 * * * /root/bin/pve-autosnap-all 2>&1 | logger -t autosnap
+```
 
 ## License
 
