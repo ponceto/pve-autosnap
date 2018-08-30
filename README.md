@@ -1,9 +1,9 @@
-# Simple Proxmox VE automatic snapshot
+# Automatic snapshot for Proxmox VE
 
 ## Description
 
-`pve-autosnap` is an utility script for Proxmox VE hypervisor that help to perform
-automatic snapshots with rolling snapshot feature.
+`pve-autosnap` is a utility script for the Proxmox VE hypervisor that allows
+automatic snapshots with a rotating snapshot feature.
 
 ## Usage
 
