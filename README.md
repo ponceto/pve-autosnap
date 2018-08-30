@@ -39,7 +39,7 @@ Another example:
 Yet another example:
 
 ```
-# automatic snapshot for all vm, at minute 4, every 4h, and keep the last 1 snapshot
+# automatic snapshot for all vm, at minute 5, every 4h, and keep the last 1 snapshot
 5 */4 * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
 ```
 
