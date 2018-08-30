@@ -21,9 +21,10 @@
 # ----------------------------------------------------------------------------
 
 QM="/usr/sbin/qm"
-QM_SELECT="listsnapshot"
-QM_CREATE="snapshot"
-QM_DELETE="delsnapshot"
+ACT_LST_ALL="list"
+ACT_LST_SNAPSHOT="listsnapshot"
+ACT_NEW_SNAPSHOT="snapshot"
+ACT_DEL_SNAPSHOT="delsnapshot"
 
 # ----------------------------------------------------------------------------
 # parse the command-line
@@ -68,7 +69,7 @@ fi
 
 if [ "x${opt_vmid}y" = "xally" ]
 then
-    VMID_LIST="$(/usr/sbin/qm list | awk '{ print $1 }' | grep -v VMID | sort -n)"
+    VMID_LIST="$(${QM} "${ACT_LST_ALL}" | awk '{ print $1 }' | grep -v VMID | sort -n)"
     for VMID in ${VMID_LIST}
     do
         if [ "${VMID}" -ge "100" ]
@@ -97,7 +98,7 @@ AUTOSNAP_VMID="${opt_vmid}"
 AUTOSNAP_KEEP="${opt_keep}"
 AUTOSNAP_NAME="autosnap_$(date '+%Y%m%d_%H%M%S')"
 AUTOSNAP_DESC="automatic snapshot"
-AUTOSNAP_LIST="$(${QM} "${QM_SELECT}" "${AUTOSNAP_VMID}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+AUTOSNAP_LIST="$(${QM} "${ACT_LST_SNAPSHOT}" "${AUTOSNAP_VMID}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
 
 # ----------------------------------------------------------------------------
 # delete old snapshots for this vmid
@@ -108,7 +109,7 @@ for AUTOSNAP_ITEM in ${AUTOSNAP_LIST}
 do
     if [ "${AUTOSNAP_LEFT}" -ge "${AUTOSNAP_KEEP}" ]
     then
-        ${QM} "${QM_DELETE}" "${AUTOSNAP_VMID}" "${AUTOSNAP_ITEM}"
+        ${QM} "${ACT_DEL_SNAPSHOT}" "${AUTOSNAP_VMID}" "${AUTOSNAP_ITEM}"
     fi
     AUTOSNAP_LEFT=$((AUTOSNAP_LEFT - 1))
 done
@@ -117,7 +118,7 @@ done
 # create new snapshot for this vmid
 # ----------------------------------------------------------------------------
 
-${QM} "${QM_CREATE}" "${AUTOSNAP_VMID}" "${AUTOSNAP_NAME}" -description "${AUTOSNAP_DESC}"
+${QM} "${ACT_NEW_SNAPSHOT}" "${AUTOSNAP_VMID}" "${AUTOSNAP_NAME}" -description "${AUTOSNAP_DESC}"
 
 # ----------------------------------------------------------------------------
 # End-Of-File
