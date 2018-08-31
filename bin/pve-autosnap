@@ -71,17 +71,25 @@ fi
 while [ "${#}" -gt "0" ]
 do
     case "${1}" in
+        *=*)
+            opt_value="$(expr "${1}" : '[^=]*=\(.*\)')"
+            ;;
+        *)
+            opt_value=""
+            ;;
+    esac
+    case "${1}" in
         --minvmid=*)
-            opt_minvmid="$(echo "${1}" | sed -e 's/--minvmid=//g')"
+            opt_minvmid="${opt_value}"
             ;;
         --maxvmid=*)
-            opt_maxvmid="$(echo "${1}" | sed -e 's/--maxvmid=//g')"
+            opt_maxvmid="${opt_value}"
             ;;
         --exclude=*)
-            opt_exclude="$(echo "${1}" | sed -e 's/--exclude=//g' -e 's/,/ /g')"
+            opt_exclude="$(echo "${opt_value}" | tr ',' ' ')"
             ;;
         --include=*)
-            opt_include="$(echo "${1}" | sed -e 's/--include=//g' -e 's/,/ /g')"
+            opt_include="$(echo "${opt_value}" | tr ',' ' ')"
             ;;
         *)
             echo "error: unsupported option [${1}]"
