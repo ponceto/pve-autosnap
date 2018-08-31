@@ -85,6 +85,18 @@ Perform a snapshot for each vmid to #1999 and keep three snapshots
 pve-autosnap all 3 --maxvmid=1999
 ```
 
+Perform no snapshot and clean all snapshot for each vmid
+
+```
+pve-autosnap all 0
+```
+
+Perform no snapshot and clean all snapshot for vmid #500
+
+```
+pve-autosnap 500 0
+```
+
 ## Automated snapshots
 
 To add a periodic task to perform automated snapshots, just edit your crontab.

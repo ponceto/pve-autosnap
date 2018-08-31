@@ -17,30 +17,32 @@
 #
 
 # ----------------------------------------------------------------------------
-# qm interface definitions
+# pve interface definitions
 # ----------------------------------------------------------------------------
 
 qm="/usr/sbin/qm"
-qm_list_vm="list"
-qm_list_snapshot="listsnapshot"
-qm_create_snapshot="snapshot"
-qm_delete_snapshot="delsnapshot"
-qm_minvmid="100"
-qm_maxvmid="9999"
+pct="/usr/sbin/pct"
+
+pve_list_vm="list"
+pve_list_snapshot="listsnapshot"
+pve_create_snapshot="snapshot"
+pve_delete_snapshot="delsnapshot"
+pve_minvmid="100"
+pve_maxvmid="9999"
 
 # ----------------------------------------------------------------------------
 # options
 # ----------------------------------------------------------------------------
 
-opt_vmid=""
-opt_keep=""
-opt_minvmid="${qm_minvmid}"
-opt_maxvmid="${qm_maxvmid}"
+opt_vmid="help"
+opt_keep="1"
+opt_minvmid="${pve_minvmid}"
+opt_maxvmid="${pve_maxvmid}"
 opt_exclude=""
 opt_include=""
 
 # ----------------------------------------------------------------------------
-# parse the command-line mandatory arguments
+# parse the command-line arguments
 # ----------------------------------------------------------------------------
 
 if [ "no${0}ne" != "none" ]
@@ -50,25 +52,22 @@ else
     self="pve-autosnap"
 fi
 
-if [ "no${1}ne" != "none" ]
+if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
 then
     opt_vmid="${1}"
-else
-    opt_vmid="help"
+    shift
 fi
 
-if [ "no${2}ne" != "none" ]
+if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
 then
-    opt_keep="${2}"
-else
-    opt_keep="1"
+    opt_keep="${1}"
+    shift
 fi
 
 # ----------------------------------------------------------------------------
-# parse the command-line remaining arguments
+# parse the command-line otions
 # ----------------------------------------------------------------------------
 
-shift 2
 while [ "${#}" -gt "0" ]
 do
     case "${1}" in
@@ -122,11 +121,11 @@ fi
 # verify the 'keep' argument
 # ----------------------------------------------------------------------------
 
-if [ "${opt_keep}" -gt "0" ]
+if [ "${opt_keep}" -ge "0" ]
 then
     status="ok"
 else
-    echo "the <keep> argument must be greater than 0"
+    echo "the <keep> argument must be greater than or equal to 0"
     exit 1
 fi
 
@@ -134,12 +133,12 @@ fi
 # verify the '--minvmid=<vmid>' argument
 # ----------------------------------------------------------------------------
 
-if [ "${opt_minvmid}" -ge "${qm_minvmid}" ] \
-&& [ "${opt_minvmid}" -le "${qm_maxvmid}" ]
+if [ "${opt_minvmid}" -ge "${pve_minvmid}" ] \
+&& [ "${opt_minvmid}" -le "${pve_maxvmid}" ]
 then
     status="ok"
 else
-    echo "the minimum vmid is not in the range [${qm_minvmid},${qm_maxvmid}]"
+    echo "the minimum vmid is not in the range [${pve_minvmid},${pve_maxvmid}]"
     exit 1
 fi
 
@@ -147,12 +146,12 @@ fi
 # verify the '--maxvmid=<vmid>' argument
 # ----------------------------------------------------------------------------
 
-if [ "${opt_maxvmid}" -ge "${qm_minvmid}" ] \
-&& [ "${opt_maxvmid}" -le "${qm_maxvmid}" ]
+if [ "${opt_maxvmid}" -ge "${pve_minvmid}" ] \
+&& [ "${opt_maxvmid}" -le "${pve_maxvmid}" ]
 then
     status="ok"
 else
-    echo "the maximum vmid is not in the range [${qm_minvmid},${qm_maxvmid}]"
+    echo "the maximum vmid is not in the range [${pve_minvmid},${pve_maxvmid}]"
     exit 1
 fi
 
@@ -200,8 +199,9 @@ fi
 
 if [ "${opt_vmid}" = "all" ]
 then
-    vmids="$(${qm} "${qm_list_vm}" | awk '{ print $1 }' | grep -v VMID | sort -n)"
-    for vmid in ${vmids}
+    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
+    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
+    for vmid in ${kvm_list} ${lxc_list}
     do
         is_excluded="no"
         for excluded in ${opt_exclude}
@@ -228,8 +228,9 @@ fi
 
 if [ "${opt_vmid}" = "none" ]
 then
-    vmids="$(${qm} "${qm_list_vm}" | awk '{ print $1 }' | grep -v VMID | sort -n)"
-    for vmid in ${vmids}
+    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
+    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
+    for vmid in ${kvm_list} ${lxc_list}
     do
         is_included="no"
         for included in ${opt_include}
@@ -256,45 +257,69 @@ fi
 
 echo "=== $(basename ${self}) ${opt_vmid} ${opt_keep} ==="
 
+run="none"
+
 # ----------------------------------------------------------------------------
-# if the given vmid seems to be a vmid, check if this is a valid vmid
+# check if this is a valid kvm vmid
 # ----------------------------------------------------------------------------
 
-if [ "x$(${qm} status ${opt_vmid} 2>/dev/null)y" = "xy" ]
+if [ "${run}" = "none" ]
+then
+    if [ "x$(${qm} status ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    then
+        run="${qm}"
+    fi
+fi
+
+# ----------------------------------------------------------------------------
+# check if this is a valid lxc vmid
+# ----------------------------------------------------------------------------
+
+if [ "${run}" = "none" ]
+then
+    if [ "x$(${pct} status ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    then
+        run="${pct}"
+    fi
+fi
+
+# ----------------------------------------------------------------------------
+# check if this is a valid vmid
+# ----------------------------------------------------------------------------
+
+if [ "${run}" = "none" ]
 then
     echo "error: <vmid> does not look like a valid VM ID"
     exit 1
 fi
 
 # ----------------------------------------------------------------------------
-# prepare the vmid snapshoting
+# create new snapshot for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_vmid="${opt_vmid}"
-autosnap_keep="${opt_keep}"
 autosnap_name="autosnap_$(date '+%Y%m%d_%H%M%S')"
 autosnap_desc="automatic snapshot"
-autosnap_list="$(${qm} "${qm_list_snapshot}" "${autosnap_vmid}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+
+if [ "${opt_keep}" -gt "0" ]
+then
+    ${run} "${pve_create_snapshot}" "${opt_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
+fi
 
 # ----------------------------------------------------------------------------
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
+autosnap_list="$(${run} "${pve_list_snapshot}" "${opt_vmid}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
+
 for autosnap_item in ${autosnap_list}
 do
-    if [ "${autosnap_left}" -ge "${autosnap_keep}" ]
+    if [ "${autosnap_left}" -gt "${opt_keep}" ]
     then
-        ${qm} "${qm_delete_snapshot}" "${autosnap_vmid}" "${autosnap_item}"
+        ${run} "${pve_delete_snapshot}" "${opt_vmid}" "${autosnap_item}"
     fi
     autosnap_left=$((autosnap_left - 1))
 done
-
-# ----------------------------------------------------------------------------
-# create new snapshot for this vmid
-# ----------------------------------------------------------------------------
-
-${qm} "${qm_create_snapshot}" "${autosnap_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
 
 # ----------------------------------------------------------------------------
 # End-Of-File
