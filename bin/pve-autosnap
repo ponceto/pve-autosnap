@@ -208,9 +208,10 @@ fi
 
 if [ "${opt_vmid}" = "all" ]
 then
-    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
-    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
-    for vmid in ${kvm_list} ${lxc_list}
+    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    vmid_list="${kvm_list} ${lxc_list}"
+    for vmid in ${vmid_list}
     do
         is_excluded="no"
         for excluded in ${opt_exclude}
@@ -237,9 +238,10 @@ fi
 
 if [ "${opt_vmid}" = "none" ]
 then
-    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
-    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }' | sort -n)"
-    for vmid in ${kvm_list} ${lxc_list}
+    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    vmid_list="${kvm_list} ${lxc_list}"
+    for vmid in ${vmid_list}
     do
         is_included="no"
         for included in ${opt_include}
