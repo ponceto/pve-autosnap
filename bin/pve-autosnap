@@ -25,26 +25,39 @@ qm_list_vm="list"
 qm_list_snapshot="listsnapshot"
 qm_create_snapshot="snapshot"
 qm_delete_snapshot="delsnapshot"
+qm_minvmid="100"
+qm_maxvmid="9999"
 
 # ----------------------------------------------------------------------------
-# parse the command-line
+# options
 # ----------------------------------------------------------------------------
 
-if [ "x${0}y" != "xy" ]
+opt_vmid=""
+opt_keep=""
+opt_minvmid="${qm_minvmid}"
+opt_maxvmid="${qm_maxvmid}"
+opt_exclude=""
+opt_include=""
+
+# ----------------------------------------------------------------------------
+# parse the command-line mandatory arguments
+# ----------------------------------------------------------------------------
+
+if [ "no${0}ne" != "none" ]
 then
     self="${0}"
 else
     self="pve-autosnap"
 fi
 
-if [ "x${1}y" != "xy" ]
+if [ "no${1}ne" != "none" ]
 then
     opt_vmid="${1}"
 else
     opt_vmid="help"
 fi
 
-if [ "x${2}y" != "xy" ]
+if [ "no${2}ne" != "none" ]
 then
     opt_keep="${2}"
 else
@@ -52,40 +65,196 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# display help
+# parse the command-line remaining arguments
 # ----------------------------------------------------------------------------
 
-if [ "x${opt_vmid}y" = "xhelpy" ]
+shift 2
+while [ "${#}" -gt "0" ]
+do
+    case "${1}" in
+        --minvmid=*)
+            opt_minvmid="$(echo "${1}" | sed -e 's/--minvmid=//g')"
+            ;;
+        --maxvmid=*)
+            opt_maxvmid="$(echo "${1}" | sed -e 's/--maxvmid=//g')"
+            ;;
+        --exclude=*)
+            opt_exclude="$(echo "${1}" | sed -e 's/--exclude=//g' -e 's/,/ /g')"
+            ;;
+        --include=*)
+            opt_include="$(echo "${1}" | sed -e 's/--include=//g' -e 's/,/ /g')"
+            ;;
+        *)
+            echo "error: unsupported option [${1}]"
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# ----------------------------------------------------------------------------
+# display help if requested
+# ----------------------------------------------------------------------------
+
+if [ "${opt_vmid}" = "help" ]
 then
     cat << ____EOF
-Usage: ${self} [ help | <vmid> [<keep>] ]
+Usage: $(basename ${self}) [ help | <vmid> [ <keep> [OPTIONS] ] ]
+
+Arguments:
+
+    help   display this help and exit
+    vmid   specifies the virtual machine id, can be 'all' or 'none'
+    keep   specifies the maximum number of snapshot to keep (default is 1)
 
 Options:
 
-    help	display this help and exit
-    vmid	specifies the virtual machine id, can be 'all' to select all VM
-    keep	specifies the maximum number of snapshot to keep (default is 1)
+    --minvmid={vmid}            specifies the first vmid (default is 100)
+    --maxvmid={vmid}            specifies the last vmid (default is 9999)
+    --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
+    --include={vmid,vmid,...}   specifies the list of vmid to include
 
 ____EOF
     exit 0
 fi
 
 # ----------------------------------------------------------------------------
-# if the given vmid is 'all', process all of them then exit
+# verify the 'keep' argument
 # ----------------------------------------------------------------------------
 
-if [ "x${opt_vmid}y" = "xally" ]
+if [ "${opt_keep}" -gt "0" ]
+then
+    status="ok"
+else
+    echo "the <keep> argument must be greater than 0"
+    exit 1
+fi
+
+# ----------------------------------------------------------------------------
+# verify the '--minvmid=<vmid>' argument
+# ----------------------------------------------------------------------------
+
+if [ "${opt_minvmid}" -ge "${qm_minvmid}" ] \
+&& [ "${opt_minvmid}" -le "${qm_maxvmid}" ]
+then
+    status="ok"
+else
+    echo "the minimum vmid is not in the range [${qm_minvmid},${qm_maxvmid}]"
+    exit 1
+fi
+
+# ----------------------------------------------------------------------------
+# verify the '--maxvmid=<vmid>' argument
+# ----------------------------------------------------------------------------
+
+if [ "${opt_maxvmid}" -ge "${qm_minvmid}" ] \
+&& [ "${opt_maxvmid}" -le "${qm_maxvmid}" ]
+then
+    status="ok"
+else
+    echo "the maximum vmid is not in the range [${qm_minvmid},${qm_maxvmid}]"
+    exit 1
+fi
+
+# ----------------------------------------------------------------------------
+# verify the '--exclude=<vmid-list>' argument
+# ----------------------------------------------------------------------------
+
+if [ "no${opt_exclude}ne" != "none" ]
+then
+    for excluded in ${opt_exclude}
+    do
+        if [ "${excluded}" -ge "${opt_minvmid}" ] \
+        && [ "${excluded}" -le "${opt_maxvmid}" ]
+        then
+            status="ok"
+        else
+            echo "error: the excluded vmid <${excluded}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
+            exit 1
+        fi
+    done
+fi
+
+# ----------------------------------------------------------------------------
+# verify the '--include=<vmid-list>' argument
+# ----------------------------------------------------------------------------
+
+if [ "no${opt_include}ne" != "none" ]
+then
+    for included in ${opt_include}
+    do
+        if [ "${included}" -ge "${opt_minvmid}" ] \
+        && [ "${included}" -le "${opt_maxvmid}" ]
+        then
+            status="ok"
+        else
+            echo "error: the included vmid <${included}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
+            exit 1
+        fi
+    done
+fi
+
+# ----------------------------------------------------------------------------
+# if the given vmid is 'all', process vmids with the exclude list then exit
+# ----------------------------------------------------------------------------
+
+if [ "${opt_vmid}" = "all" ]
 then
     vmids="$(${qm} "${qm_list_vm}" | awk '{ print $1 }' | grep -v VMID | sort -n)"
     for vmid in ${vmids}
     do
-        if [ "${vmid}" -ge "100" ]
+        is_excluded="no"
+        for excluded in ${opt_exclude}
+        do
+            if [ "${vmid}" -eq "${excluded}" ]
+            then
+                is_excluded="yes"
+                break;
+            fi
+        done
+        if [ "${is_excluded}" = "no" ] \
+        && [ "${vmid}" -ge "${opt_minvmid}" ] \
+        && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
             ${self} "${vmid}" ${opt_keep}
         fi
     done
     exit 0
 fi
+
+# ----------------------------------------------------------------------------
+# if the given vmid is 'none', process vmids with the include list then exit
+# ----------------------------------------------------------------------------
+
+if [ "${opt_vmid}" = "none" ]
+then
+    vmids="$(${qm} "${qm_list_vm}" | awk '{ print $1 }' | grep -v VMID | sort -n)"
+    for vmid in ${vmids}
+    do
+        is_included="no"
+        for included in ${opt_include}
+        do
+            if [ "${vmid}" -eq "${included}" ]
+            then
+                is_included="yes"
+                break;
+            fi
+        done
+        if [ "${is_included}" = "yes" ] \
+        && [ "${vmid}" -ge "${opt_minvmid}" ] \
+        && [ "${vmid}" -le "${opt_maxvmid}" ]
+        then
+            ${self} "${vmid}" ${opt_keep}
+        fi
+    done
+    exit 0
+fi
+
+# ----------------------------------------------------------------------------
+# process the given vmid
+# ----------------------------------------------------------------------------
+
+echo "=== $(basename ${self}) ${opt_vmid} ${opt_keep} ==="
 
 # ----------------------------------------------------------------------------
 # if the given vmid seems to be a vmid, check if this is a valid vmid

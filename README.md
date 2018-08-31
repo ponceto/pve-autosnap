@@ -12,13 +12,78 @@ adjust the permissions if needed with a simple `chmod 755 pve-autosnap`.
 
 ## Usage
 
-*Usage*: `pve-autosnap [ help | vmid [ keep ] ]`
+```
+Usage: pve-autosnap [ help | <vmid> [ <keep> [OPTIONS] ] ]
 
-*Options:*
+Arguments:
 
-  - `help`	display help and exit
-  - `vmid`	specifies the virtual machine id, can be `all`
-  - `keep`	specifies the maximum number of snapshot to keep (default is 1)
+    help   display this help and exit
+    vmid   specifies the virtual machine id, can be 'all' or 'none'
+    keep   specifies the maximum number of snapshot to keep (default is 1)
+
+Options:
+
+    --minvmid={vmid}            specifies the first vmid (default is 100)
+    --maxvmid={vmid}            specifies the last vmid (default is 9999)
+    --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
+    --include={vmid,vmid,...}   specifies the list of vmid to include
+```
+
+## Examples
+
+Perform a snapshot for the vmid #500 and keep one snapshot
+
+```
+pve-autosnap 500
+```
+
+Perform a snapshot for the vmid #750 and keep two snapshots
+
+```
+pve-autosnap 750 2
+```
+
+Perform a snapshot for each vmid and keep one snapshot
+
+```
+pve-autosnap all
+```
+
+Perform a snapshot for each vmid and keep two snapshots
+
+```
+pve-autosnap all 2
+```
+
+Perform a snapshot for each vmid but the #150 and #300 and keep one snapshot
+
+```
+pve-autosnap all 1 --exclude=150,300
+```
+
+Perform a snapshot just for vmid #200 and #250 and keep two snapshots
+
+```
+pve-autosnap none 2 --include=200,250
+```
+
+Perform a snapshot for each vmid between #1000 and #1999 but the #1500 and keep two snapshots
+
+```
+pve-autosnap all 2 --minvmid=1000 --maxvmid=1999 --exclude=1500
+```
+
+Perform a snapshot for each vmid from #1000 and keep three snapshots
+
+```
+pve-autosnap all 3 --minvmid=1000
+```
+
+Perform a snapshot for each vmid to #1999 and keep three snapshots
+
+```
+pve-autosnap all 3 --maxvmid=1999
+```
 
 ## Automated snapshots
 
