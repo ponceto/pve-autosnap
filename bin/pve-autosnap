@@ -73,24 +73,24 @@ while [ "${#}" -gt "0" ]
 do
     case "${1}" in
         *=*)
-            opt_value="$(expr "${1}" : '[^=]*=\(.*\)')"
+            arg_value="$(expr "${1}" : '[^=]*=\(.*\)')"
             ;;
         *)
-            opt_value=""
+            arg_value=""
             ;;
     esac
     case "${1}" in
         --minvmid=*)
-            opt_minvmid="${opt_value}"
+            opt_minvmid="${arg_value}"
             ;;
         --maxvmid=*)
-            opt_maxvmid="${opt_value}"
+            opt_maxvmid="${arg_value}"
             ;;
         --exclude=*)
-            opt_exclude="$(echo "${opt_value}" | tr ',' ' ')"
+            opt_exclude="$(echo "${arg_value}" | tr ',' ' ')"
             ;;
         --include=*)
-            opt_include="$(echo "${opt_value}" | tr ',' ' ')"
+            opt_include="$(echo "${arg_value}" | tr ',' ' ')"
             ;;
         *)
             echo "error: unsupported option [${1}]"
@@ -170,14 +170,14 @@ fi
 
 if [ "no${opt_exclude}ne" != "none" ]
 then
-    for excluded in ${opt_exclude}
+    for excluded_vm in ${opt_exclude}
     do
-        if [ "${excluded}" -ge "${opt_minvmid}" ] \
-        && [ "${excluded}" -le "${opt_maxvmid}" ]
+        if [ "${excluded_vm}" -ge "${opt_minvmid}" ] \
+        && [ "${excluded_vm}" -le "${opt_maxvmid}" ]
         then
             status="ok"
         else
-            echo "error: the excluded vmid <${excluded}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
+            echo "error: the excluded vmid <${excluded_vm}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
             exit 1
         fi
     done
@@ -189,14 +189,14 @@ fi
 
 if [ "no${opt_include}ne" != "none" ]
 then
-    for included in ${opt_include}
+    for included_vm in ${opt_include}
     do
-        if [ "${included}" -ge "${opt_minvmid}" ] \
-        && [ "${included}" -le "${opt_maxvmid}" ]
+        if [ "${included_vm}" -ge "${opt_minvmid}" ] \
+        && [ "${included_vm}" -le "${opt_maxvmid}" ]
         then
             status="ok"
         else
-            echo "error: the included vmid <${included}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
+            echo "error: the included vmid <${included_vm}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
             exit 1
         fi
     done
@@ -214,9 +214,9 @@ then
     for vmid in ${vmid_list}
     do
         is_excluded="no"
-        for excluded in ${opt_exclude}
+        for excluded_vm in ${opt_exclude}
         do
-            if [ "${vmid}" -eq "${excluded}" ]
+            if [ "${vmid}" -eq "${excluded_vm}" ]
             then
                 is_excluded="yes"
                 break;
@@ -226,7 +226,7 @@ then
         && [ "${vmid}" -ge "${opt_minvmid}" ] \
         && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
-            ${self} "${vmid}" ${opt_keep}
+            ${self} "${vmid}" "${opt_keep}"
         fi
     done
     exit 0
@@ -244,9 +244,9 @@ then
     for vmid in ${vmid_list}
     do
         is_included="no"
-        for included in ${opt_include}
+        for included_vm in ${opt_include}
         do
-            if [ "${vmid}" -eq "${included}" ]
+            if [ "${vmid}" -eq "${included_vm}" ]
             then
                 is_included="yes"
                 break;
@@ -256,7 +256,7 @@ then
         && [ "${vmid}" -ge "${opt_minvmid}" ] \
         && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
-            ${self} "${vmid}" ${opt_keep}
+            ${self} "${vmid}" "${opt_keep}"
         fi
     done
     exit 0
@@ -276,7 +276,7 @@ run="none"
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${qm} "${cmd_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    if [ "x$(${qm} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
     then
         run="${qm}"
     fi
@@ -288,7 +288,7 @@ fi
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${ct} "${cmd_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    if [ "x$(${ct} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
     then
         run="${ct}"
     fi
