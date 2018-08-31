@@ -21,13 +21,13 @@
 # ----------------------------------------------------------------------------
 
 qm="/usr/sbin/qm"
-pct="/usr/sbin/pct"
+ct="/usr/sbin/pct"
 
-pve_status="status"
-pve_list_vm="list"
-pve_list_snapshot="listsnapshot"
-pve_create_snapshot="snapshot"
-pve_delete_snapshot="delsnapshot"
+cmd_status="status"
+cmd_list_vm="list"
+cmd_list_snapshot="listsnapshot"
+cmd_create_snapshot="snapshot"
+cmd_delete_snapshot="delsnapshot"
 pve_minvmid="100"
 pve_maxvmid="9999"
 
@@ -208,9 +208,9 @@ fi
 
 if [ "${opt_vmid}" = "all" ]
 then
-    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    vmid_list="${kvm_list} ${lxc_list}"
+    qm_list="$(${qm} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    ct_list="$(${ct} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    vmid_list="${qm_list} ${ct_list}"
     for vmid in ${vmid_list}
     do
         is_excluded="no"
@@ -238,9 +238,9 @@ fi
 
 if [ "${opt_vmid}" = "none" ]
 then
-    kvm_list="$(${qm}  "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    lxc_list="$(${pct} "${pve_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    vmid_list="${kvm_list} ${lxc_list}"
+    qm_list="$(${qm} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    ct_list="$(${ct} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    vmid_list="${qm_list} ${ct_list}"
     for vmid in ${vmid_list}
     do
         is_included="no"
@@ -276,7 +276,7 @@ run="none"
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${qm} "${pve_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    if [ "x$(${qm} "${cmd_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
     then
         run="${qm}"
     fi
@@ -288,9 +288,9 @@ fi
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${pct} "${pve_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    if [ "x$(${ct} "${cmd_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
     then
-        run="${pct}"
+        run="${ct}"
     fi
 fi
 
@@ -313,21 +313,21 @@ autosnap_desc="automatic snapshot"
 
 if [ "${opt_keep}" -gt "0" ]
 then
-    ${run} "${pve_create_snapshot}" "${opt_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
+    ${run} "${cmd_create_snapshot}" "${opt_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
 fi
 
 # ----------------------------------------------------------------------------
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_list="$(${run} "${pve_list_snapshot}" "${opt_vmid}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+autosnap_list="$(${run} "${cmd_list_snapshot}" "${opt_vmid}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
 
 for autosnap_item in ${autosnap_list}
 do
     if [ "${autosnap_left}" -gt "${opt_keep}" ]
     then
-        ${run} "${pve_delete_snapshot}" "${opt_vmid}" "${autosnap_item}"
+        ${run} "${cmd_delete_snapshot}" "${opt_vmid}" "${autosnap_item}"
     fi
     autosnap_left=$((autosnap_left - 1))
 done
