@@ -23,6 +23,7 @@
 qm="/usr/sbin/qm"
 pct="/usr/sbin/pct"
 
+pve_status="status"
 pve_list_vm="list"
 pve_list_snapshot="listsnapshot"
 pve_create_snapshot="snapshot"
@@ -273,7 +274,7 @@ run="none"
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${qm} status ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    if [ "x$(${qm} "${pve_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
     then
         run="${qm}"
     fi
@@ -285,7 +286,7 @@ fi
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${pct} status ${opt_vmid} 2>/dev/null)y" != "xy" ]
+    if [ "x$(${pct} "${pve_status}" ${opt_vmid} 2>/dev/null)y" != "xy" ]
     then
         run="${pct}"
     fi
