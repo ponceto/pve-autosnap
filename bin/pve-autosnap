@@ -20,8 +20,8 @@
 # pve interface definitions
 # ----------------------------------------------------------------------------
 
-qm="/usr/sbin/qm"
-ct="/usr/sbin/pct"
+kvm_manager="/usr/sbin/qm"
+lxc_manager="/usr/sbin/pct"
 
 cmd_status="status"
 cmd_list_vm="list"
@@ -41,6 +41,7 @@ opt_minvmid="${pve_minvmid}"
 opt_maxvmid="${pve_maxvmid}"
 opt_exclude=""
 opt_include=""
+opt_debug="no"
 
 # ----------------------------------------------------------------------------
 # parse the command-line arguments
@@ -92,6 +93,18 @@ do
         --include=*)
             opt_include="$(echo "${arg_value}" | tr ',' ' ')"
             ;;
+        --kvm-manager=*)
+            kvm_manager="${arg_value}"
+            ;;
+        --lxc-manager=*)
+            lxc_manager="${arg_value}"
+            ;;
+        --debug=*)
+            opt_debug="${arg_value}"
+            ;;
+        --debug)
+            opt_debug="yes"
+            ;;
         *)
             echo "error: unsupported option [${1}]"
             exit 1
@@ -99,6 +112,15 @@ do
     esac
     shift
 done
+
+# ----------------------------------------------------------------------------
+# enable the debug mode if requested
+# ----------------------------------------------------------------------------
+
+if [ "${opt_debug}" = "yes" ]
+then
+    set -x
+fi
 
 # ----------------------------------------------------------------------------
 # display help if requested
@@ -121,6 +143,15 @@ Options:
     --maxvmid={vmid}            specifies the last vmid (default is 9999)
     --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
     --include={vmid,vmid,...}   specifies the list of vmid to include
+
+PVE options:
+
+    --kvm-manager={path}        specifies the path of the KVM manager ('/usr/sbin/qm')
+    --lxc-manager={path}        specifies the path of the LXC manager ('/usr/sbin/pct')
+
+Special options:
+
+    --debug[={yes|no}]          enable/disable the debug mode
 
 ____EOF
     exit 0
@@ -208,9 +239,9 @@ fi
 
 if [ "${opt_vmid}" = "all" ]
 then
-    qm_list="$(${qm} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    ct_list="$(${ct} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    vmid_list="${qm_list} ${ct_list}"
+    kvm_list="$(${kvm_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    lxc_list="$(${lxc_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    vmid_list="${kvm_list} ${lxc_list}"
     for vmid in ${vmid_list}
     do
         is_excluded="no"
@@ -238,9 +269,9 @@ fi
 
 if [ "${opt_vmid}" = "none" ]
 then
-    qm_list="$(${qm} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    ct_list="$(${ct} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
-    vmid_list="${qm_list} ${ct_list}"
+    kvm_list="$(${kvm_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    lxc_list="$(${lxc_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
+    vmid_list="${kvm_list} ${lxc_list}"
     for vmid in ${vmid_list}
     do
         is_included="no"
@@ -276,9 +307,9 @@ run="none"
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${qm} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
+    if [ "x$(${kvm_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
     then
-        run="${qm}"
+        run="${kvm_manager}"
     fi
 fi
 
@@ -288,9 +319,9 @@ fi
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${ct} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
+    if [ "x$(${lxc_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
     then
-        run="${ct}"
+        run="${lxc_manager}"
     fi
 fi
 

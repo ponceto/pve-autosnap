@@ -27,6 +27,15 @@ Options:
     --maxvmid={vmid}            specifies the last vmid (default is 9999)
     --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
     --include={vmid,vmid,...}   specifies the list of vmid to include
+
+PVE options:
+
+    --kvm-manager={path}        specifies the path of the KVM manager ('/usr/sbin/qm')
+    --lxc-manager={path}        specifies the path of the LXC manager ('/usr/sbin/pct')
+
+Special options:
+
+    --debug[={yes|no}]          enable/disable the debug mode
 ```
 
 ## Examples
