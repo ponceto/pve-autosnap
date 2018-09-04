@@ -299,17 +299,19 @@ fi
 
 echo "=== $(basename ${self}) ${opt_vmid} ${opt_keep} ==="
 
-run="none"
+vm_status=""
+vm_manager=""
 
 # ----------------------------------------------------------------------------
 # check if this is a valid kvm vmid
 # ----------------------------------------------------------------------------
 
-if [ "${run}" = "none" ]
+if [ "no${vm_manager}ne" = "none" ]
 then
-    if [ "no$(${kvm_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)ne" != "none" ]
+    vm_status="$(${kvm_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)"
+    if [ "no${vm_status}ne" != "none" ]
     then
-        run="${kvm_manager}"
+        vm_manager="${kvm_manager}"
     fi
 fi
 
@@ -317,11 +319,12 @@ fi
 # check if this is a valid lxc vmid
 # ----------------------------------------------------------------------------
 
-if [ "${run}" = "none" ]
+if [ "no${vm_manager}ne" = "none" ]
 then
-    if [ "no$(${lxc_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)ne" != "none" ]
+    vm_status="$(${lxc_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)"
+    if [ "no${vm_status}ne" != "none" ]
     then
-        run="${lxc_manager}"
+        vm_manager="${lxc_manager}"
     fi
 fi
 
@@ -329,7 +332,7 @@ fi
 # check if this is a valid vmid
 # ----------------------------------------------------------------------------
 
-if [ "${run}" = "none" ]
+if [ "no${vm_manager}ne" = "none" ]
 then
     echo "error: <vmid> does not look like a valid VM ID"
     exit 1
@@ -344,21 +347,21 @@ autosnap_desc="automatic snapshot"
 
 if [ "${opt_keep}" -gt "0" ]
 then
-    ${run} "${cmd_create_snapshot}" "${opt_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
+    ${vm_manager} "${cmd_create_snapshot}" "${opt_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
 fi
 
 # ----------------------------------------------------------------------------
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_list="$(${run} "${cmd_list_snapshot}" "${opt_vmid}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | grep "^autosnap_" | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
 
 for autosnap_item in ${autosnap_list}
 do
     if [ "${autosnap_left}" -gt "${opt_keep}" ]
     then
-        ${run} "${cmd_delete_snapshot}" "${opt_vmid}" "${autosnap_item}"
+        ${vm_manager} "${cmd_delete_snapshot}" "${opt_vmid}" "${autosnap_item}"
     fi
     autosnap_left=$((autosnap_left - 1))
 done
