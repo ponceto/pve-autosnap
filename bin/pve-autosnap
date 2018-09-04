@@ -250,7 +250,7 @@ then
             if [ "${vmid}" -eq "${excluded_vm}" ]
             then
                 is_excluded="yes"
-                break;
+                break
             fi
         done
         if [ "${is_excluded}" = "no" ] \
@@ -280,7 +280,7 @@ then
             if [ "${vmid}" -eq "${included_vm}" ]
             then
                 is_included="yes"
-                break;
+                break
             fi
         done
         if [ "${is_included}" = "yes" ] \
