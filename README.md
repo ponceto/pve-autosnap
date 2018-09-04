@@ -2,8 +2,8 @@
 
 ## Description
 
-`pve-autosnap` is a utility script for the [Proxmox VE](https://www.proxmox.com)
-hypervisor that allows automatic snapshots with a rotating snapshot feature.
+`pve-autosnap` is a utility script for the [Proxmox VE](https://www.proxmox.com) hypervisor
+that allows automatic snapshots with a rotating snapshot feature.
 
 ## Installation
 
