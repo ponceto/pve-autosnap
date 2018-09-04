@@ -307,7 +307,7 @@ run="none"
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${kvm_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
+    if [ "no$(${kvm_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)ne" != "none" ]
     then
         run="${kvm_manager}"
     fi
@@ -319,7 +319,7 @@ fi
 
 if [ "${run}" = "none" ]
 then
-    if [ "x$(${lxc_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)y" != "xy" ]
+    if [ "no$(${lxc_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)ne" != "none" ]
     then
         run="${lxc_manager}"
     fi
