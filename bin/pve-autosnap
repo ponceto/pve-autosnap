@@ -163,7 +163,7 @@ fi
 
 if [ "${opt_keep}" -ge "0" ]
 then
-    status="ok"
+    : # no-op
 else
     echo "the <keep> argument must be greater than or equal to 0"
     exit 1
@@ -176,7 +176,7 @@ fi
 if [ "${opt_minvmid}" -ge "${pve_minvmid}" ] \
 && [ "${opt_minvmid}" -le "${pve_maxvmid}" ]
 then
-    status="ok"
+    : # no-op
 else
     echo "the minimum vmid is not in the range [${pve_minvmid},${pve_maxvmid}]"
     exit 1
@@ -189,7 +189,7 @@ fi
 if [ "${opt_maxvmid}" -ge "${pve_minvmid}" ] \
 && [ "${opt_maxvmid}" -le "${pve_maxvmid}" ]
 then
-    status="ok"
+    : # no-op
 else
     echo "the maximum vmid is not in the range [${pve_minvmid},${pve_maxvmid}]"
     exit 1
@@ -206,7 +206,7 @@ then
         if [ "${excluded_vm}" -ge "${opt_minvmid}" ] \
         && [ "${excluded_vm}" -le "${opt_maxvmid}" ]
         then
-            status="ok"
+            : # no-op
         else
             echo "error: the excluded vmid <${excluded_vm}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
             exit 1
@@ -225,7 +225,7 @@ then
         if [ "${included_vm}" -ge "${opt_minvmid}" ] \
         && [ "${included_vm}" -le "${opt_maxvmid}" ]
         then
-            status="ok"
+            : # no-op
         else
             echo "error: the included vmid <${included_vm}> is not in the range [${opt_minvmid},${opt_maxvmid}]"
             exit 1
