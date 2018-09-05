@@ -20,16 +20,18 @@
 # pve interface definitions
 # ----------------------------------------------------------------------------
 
-kvm_manager="/usr/sbin/qm"
-lxc_manager="/usr/sbin/pct"
+pve_kvm_manager="/usr/sbin/qm"
+pve_lxc_manager="/usr/sbin/pct"
+pve_minvmid="100"
+pve_maxvmid="9999"
 
+kvm_manager="${pve_kvm_manager}"
+lxc_manager="${pve_lxc_manager}"
 cmd_status="status"
 cmd_list_vm="list"
 cmd_list_snapshot="listsnapshot"
 cmd_create_snapshot="snapshot"
 cmd_delete_snapshot="delsnapshot"
-pve_minvmid="100"
-pve_maxvmid="9999"
 
 # ----------------------------------------------------------------------------
 # options
@@ -41,6 +43,7 @@ opt_minvmid="${pve_minvmid}"
 opt_maxvmid="${pve_maxvmid}"
 opt_exclude=""
 opt_include=""
+opt_help="no"
 opt_debug="no"
 
 # ----------------------------------------------------------------------------
@@ -62,7 +65,7 @@ if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
 then
     case "${1}" in
         --help)
-            opt_vmid="help"
+            opt_help="yes"
             shift
             ;;
         [0-9]* | all | none | help)
@@ -84,7 +87,7 @@ if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
 then
     case "${1}" in
         --help)
-            opt_vmid="help"
+            opt_help="yes"
             shift
             ;;
         [0-9]*)
@@ -113,9 +116,6 @@ do
             ;;
     esac
     case "${1}" in
-        --help)
-            opt_vmid="help"
-            ;;
         --minvmid=*)
             opt_minvmid="${arg_value}"
             ;;
@@ -134,11 +134,14 @@ do
         --lxc-manager=*)
             lxc_manager="${arg_value}"
             ;;
-        --debug=*)
-            opt_debug="${arg_value}"
+        --help)
+            opt_help="yes"
             ;;
         --debug)
             opt_debug="yes"
+            ;;
+        --debug=*)
+            opt_debug="${arg_value}"
             ;;
         *)
             echo "error: unsupported option [${1}]"
@@ -149,19 +152,10 @@ do
 done
 
 # ----------------------------------------------------------------------------
-# enable the debug mode if requested
-# ----------------------------------------------------------------------------
-
-if [ "${opt_debug}" = "yes" ]
-then
-    set -x
-fi
-
-# ----------------------------------------------------------------------------
 # display help if requested
 # ----------------------------------------------------------------------------
 
-if [ "${opt_vmid}" = "help" ]
+if [ "${opt_help}" = "yes" ] || [ "${opt_vmid}" = "help" ]
 then
     cat << ____EOF
 Usage: $(basename ${self}) [ help | <vmid> [ <keep> [OPTIONS] ] ]
@@ -181,8 +175,8 @@ Options:
 
 PVE options:
 
-    --kvm-manager={path}        specifies the path of the KVM manager ('/usr/sbin/qm')
-    --lxc-manager={path}        specifies the path of the LXC manager ('/usr/sbin/pct')
+    --kvm-manager={path}        specifies the KVM manager ('${pve_kvm_manager}')
+    --lxc-manager={path}        specifies the LXC manager ('${pve_lxc_manager}')
 
 Special options:
 
@@ -194,7 +188,16 @@ ____EOF
 fi
 
 # ----------------------------------------------------------------------------
-# verify the 'keep' argument
+# enable the debug mode if requested
+# ----------------------------------------------------------------------------
+
+if [ "${opt_debug}" = "yes" ]
+then
+    set -x
+fi
+
+# ----------------------------------------------------------------------------
+# verify the <keep> argument
 # ----------------------------------------------------------------------------
 
 if [ "${opt_keep}" -ge "0" ]
@@ -206,7 +209,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# verify the '--minvmid=<vmid>' argument
+# verify the '--minvmid={vmid}' option
 # ----------------------------------------------------------------------------
 
 if [ "${opt_minvmid}" -ge "${pve_minvmid}" ] \
@@ -219,7 +222,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# verify the '--maxvmid=<vmid>' argument
+# verify the '--maxvmid={vmid}' option
 # ----------------------------------------------------------------------------
 
 if [ "${opt_maxvmid}" -ge "${pve_minvmid}" ] \
@@ -232,7 +235,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# verify the '--exclude=<vmid-list>' argument
+# verify the '--exclude={vmid,vmid,...}' option
 # ----------------------------------------------------------------------------
 
 if [ "no${opt_exclude}ne" != "none" ]
@@ -251,7 +254,7 @@ then
 fi
 
 # ----------------------------------------------------------------------------
-# verify the '--include=<vmid-list>' argument
+# verify the '--include={vmid,vmid,...}' option
 # ----------------------------------------------------------------------------
 
 if [ "no${opt_include}ne" != "none" ]
@@ -270,7 +273,7 @@ then
 fi
 
 # ----------------------------------------------------------------------------
-# verify the '--kvm-manager=<path>' argument
+# verify the '--kvm-manager={path}' option
 # ----------------------------------------------------------------------------
 
 if [ "no${kvm_manager}ne" != "none" ] && [ -x "${kvm_manager}" ]
@@ -282,7 +285,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# verify the '--lxc-manager=<path>' argument
+# verify the '--lxc-manager={path}' option
 # ----------------------------------------------------------------------------
 
 if [ "no${lxc_manager}ne" != "none" ] && [ -x "${lxc_manager}" ]
@@ -294,7 +297,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# if the given vmid is 'all', process vmids with the exclude list then exit
+# if the given <vmid> is 'all', process vmids with the exclude list then exit
 # ----------------------------------------------------------------------------
 
 if [ "${opt_vmid}" = "all" ]
@@ -324,7 +327,7 @@ then
 fi
 
 # ----------------------------------------------------------------------------
-# if the given vmid is 'none', process vmids with the include list then exit
+# if the given <vmid> is 'none', process vmids with the include list then exit
 # ----------------------------------------------------------------------------
 
 if [ "${opt_vmid}" = "none" ]
@@ -354,7 +357,7 @@ then
 fi
 
 # ----------------------------------------------------------------------------
-# process the given vmid
+# process the given <vmid>
 # ----------------------------------------------------------------------------
 
 echo "=== $(basename ${self}) ${opt_vmid} ${opt_keep} ==="

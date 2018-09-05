@@ -30,8 +30,8 @@ Options:
 
 PVE options:
 
-    --kvm-manager={path}        specifies the path of the KVM manager ('/usr/sbin/qm')
-    --lxc-manager={path}        specifies the path of the LXC manager ('/usr/sbin/pct')
+    --kvm-manager={path}        specifies the KVM manager ('/usr/sbin/qm')
+    --lxc-manager={path}        specifies the LXC manager ('/usr/sbin/pct')
 
 Special options:
 
