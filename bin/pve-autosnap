@@ -44,7 +44,7 @@ opt_include=""
 opt_debug="no"
 
 # ----------------------------------------------------------------------------
-# parse the command-line arguments
+# get the command-line program
 # ----------------------------------------------------------------------------
 
 if [ "no${0}ne" != "none" ]
@@ -54,16 +54,48 @@ else
     self="pve-autosnap"
 fi
 
-if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
-then
-    opt_vmid="${1}"
-    shift
-fi
+# ----------------------------------------------------------------------------
+# parse the <vmid> positional parameter
+# ----------------------------------------------------------------------------
 
 if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
 then
-    opt_keep="${1}"
-    shift
+    case "${1}" in
+        --help)
+            opt_vmid="help"
+            shift
+            ;;
+        [0-9]* | all | none | help)
+            opt_vmid="${1}"
+            shift
+            ;;
+        *)
+            echo "error: invalid <vmid> argument [${1}]"
+            exit 1
+            ;;
+    esac
+fi
+
+# ----------------------------------------------------------------------------
+# parse the <keep> positional parameter
+# ----------------------------------------------------------------------------
+
+if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
+then
+    case "${1}" in
+        --help)
+            opt_vmid="help"
+            shift
+            ;;
+        [0-9]*)
+            opt_keep="${1}"
+            shift
+            ;;
+        *)
+            echo "error: invalid <keep> argument [${1}]"
+            exit 1
+            ;;
+    esac
 fi
 
 # ----------------------------------------------------------------------------
@@ -81,6 +113,9 @@ do
             ;;
     esac
     case "${1}" in
+        --help)
+            opt_vmid="help"
+            ;;
         --minvmid=*)
             opt_minvmid="${arg_value}"
             ;;
@@ -151,6 +186,7 @@ PVE options:
 
 Special options:
 
+    --help                      display this help and exit
     --debug[={yes|no}]          enable/disable the debug mode
 
 ____EOF
@@ -231,6 +267,30 @@ then
             exit 1
         fi
     done
+fi
+
+# ----------------------------------------------------------------------------
+# verify the '--kvm-manager=<path>' argument
+# ----------------------------------------------------------------------------
+
+if [ "no${kvm_manager}ne" != "none" ] && [ -x "${kvm_manager}" ]
+then
+    : # no-op
+else
+    echo "error: the kvm manager <${kvm_manager}> is not a valid program"
+    exit 1
+fi
+
+# ----------------------------------------------------------------------------
+# verify the '--lxc-manager=<path>' argument
+# ----------------------------------------------------------------------------
+
+if [ "no${lxc_manager}ne" != "none" ] && [ -x "${lxc_manager}" ]
+then
+    : # no-op
+else
+    echo "error: the lxc manager <${lxc_manager}> is not a valid program"
+    exit 1
 fi
 
 # ----------------------------------------------------------------------------

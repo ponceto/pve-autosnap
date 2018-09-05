@@ -35,6 +35,7 @@ PVE options:
 
 Special options:
 
+    --help                      display this help and exit
     --debug[={yes|no}]          enable/disable the debug mode
 ```
 
