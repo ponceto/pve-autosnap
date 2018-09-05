@@ -17,13 +17,17 @@
 #
 
 # ----------------------------------------------------------------------------
-# pve interface definitions
+# pve definitions
 # ----------------------------------------------------------------------------
 
 pve_kvm_manager="/usr/sbin/qm"
 pve_lxc_manager="/usr/sbin/pct"
 pve_minvmid="100"
 pve_maxvmid="9999"
+
+# ----------------------------------------------------------------------------
+# kvm/lxc manager definitions
+# ----------------------------------------------------------------------------
 
 kvm_manager="${pve_kvm_manager}"
 lxc_manager="${pve_lxc_manager}"
@@ -34,7 +38,7 @@ cmd_create_snapshot="snapshot"
 cmd_delete_snapshot="delsnapshot"
 
 # ----------------------------------------------------------------------------
-# options
+# program options
 # ----------------------------------------------------------------------------
 
 opt_vmid="help"
@@ -47,14 +51,14 @@ opt_help="no"
 opt_debug="no"
 
 # ----------------------------------------------------------------------------
-# get the command-line program
+# get the program name
 # ----------------------------------------------------------------------------
 
 if [ "no${0}ne" != "none" ]
 then
-    self="${0}"
+    pve_autosnap="${0}"
 else
-    self="pve-autosnap"
+    pve_autosnap="pve-autosnap"
 fi
 
 # ----------------------------------------------------------------------------
@@ -158,7 +162,7 @@ done
 if [ "${opt_help}" = "yes" ] || [ "${opt_vmid}" = "help" ]
 then
     cat << ____EOF
-Usage: $(basename ${self}) [ help | <vmid> [ <keep> [OPTIONS] ] ]
+Usage: $(basename ${pve_autosnap}) [ help | <vmid> [ <keep> [OPTIONS] ] ]
 
 Arguments:
 
@@ -320,7 +324,7 @@ then
         && [ "${vmid}" -ge "${opt_minvmid}" ] \
         && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
-            ${self} "${vmid}" "${opt_keep}"
+            ${pve_autosnap} "${vmid}" "${opt_keep}"
         fi
     done
     exit 0
@@ -350,7 +354,7 @@ then
         && [ "${vmid}" -ge "${opt_minvmid}" ] \
         && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
-            ${self} "${vmid}" "${opt_keep}"
+            ${pve_autosnap} "${vmid}" "${opt_keep}"
         fi
     done
     exit 0
@@ -360,7 +364,7 @@ fi
 # process the given <vmid>
 # ----------------------------------------------------------------------------
 
-echo "=== $(basename ${self}) ${opt_vmid} ${opt_keep} ==="
+echo "=== $(basename ${pve_autosnap}) ${opt_vmid} ${opt_keep} ==="
 
 vm_status=""
 vm_manager=""
