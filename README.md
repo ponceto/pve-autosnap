@@ -111,7 +111,7 @@ pve-autosnap 500 0
 
 To add a periodic task to perform automated snapshots, just edit your crontab.
 
-It is recommended to redirect 'stderr' to 'stdout' and pipe the result to the
+It is recommended to redirect `stderr` to `stdout` and pipe the result to the
 `logger` utility in order to send the resulting logs to the local syslog service.
 
 Example:
