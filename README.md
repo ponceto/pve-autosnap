@@ -1,14 +1,27 @@
-# Automatic snapshot for Proxmox VE
+# Automatic snapshots for Proxmox VE
+
+## Abstract
+
+`pve-autosnap` is a utility script for the [Proxmox VE](https://www.proxmox.com) hypervisor that allows to perform automatic snapshots with a rotating snapshot feature.
 
 ## Description
 
-`pve-autosnap` is a utility script for the [Proxmox VE](https://www.proxmox.com) hypervisor
-that allows to perform automatic snapshots with a rotating snapshot feature.
+This script will help you to perform automatic rotated snapshots.
 
 ## Installation
 
-Just copy the script in a well-known directory, like `/usr/local/bin`, and
-adjust the permissions if needed with a simple `chmod 755 pve-autosnap`.
+Clone the repository in the `/opt/pve-autosnap` directory on your PVE node:
+
+```
+git clone {repository-url} /opt/pve-autosnap
+```
+
+Then create a symbolic link into the `/usr/local/bin` directory:
+
+```
+cd /usr/local/bin
+ln -sf ../../../opt/pve-autosnap/bin/pve-autosnap ./pve-autosnap
+```
 
 ## Usage
 
