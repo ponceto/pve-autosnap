@@ -409,7 +409,7 @@ fi
 # create new snapshot for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_name="autosnap_$(date '+%Y%m%d_%H%M%S')"
+autosnap_name="AUTOSNAP_$(date '+%Y%m%d_%H%M%S')"
 autosnap_desc="automatic snapshot"
 
 if [ "${opt_keep}" -gt "0" ]
@@ -421,7 +421,7 @@ fi
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep "^autosnap_" | awk '{ print $1 }' | sort)"
+autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i "^AUTOSNAP_" | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
 
 for autosnap_item in ${autosnap_list}
