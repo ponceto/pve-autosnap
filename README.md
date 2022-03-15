@@ -40,6 +40,7 @@ Options:
     --maxvmid={vmid}            specifies the last vmid (default is 9999)
     --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
     --include={vmid,vmid,...}   specifies the list of vmid to include
+    --tag={tag}                 specifies an optional snapshot tag (snapshots will be named "AUTOSNAP_{tag}_YYYYMMDD_HHMMSS")
 
 PVE options:
 
@@ -146,6 +147,28 @@ Yet another example:
 ```crontab
 # automatic snapshot for all vm, at minute 5, every 4h, and keep the last 1 snapshot
 5 */4 * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
+```
+
+## Tagging snapshots
+
+Snapshot tagging will allow you to create multiple cron jobs with differents rules, for example hourly, daily, weekly and monthly snapshots:
+
+Example for 48 hourly snapshots:
+
+```crontab
+0 * * * * /usr/local/bin/pve-autosnap all 48 --tag=HOURLY 2>&1 | logger -t autosnap-hourly
+```
+
+Example for 30 daily snapshots:
+
+```crontab
+0 0 * * * /usr/local/bin/pve-autosnap all 30 --tag=DAILY 2>&1 | logger -t autosnap-daily
+```
+
+Example for 3 monthly snapshots:
+
+```crontab
+0 0 1 * * /usr/local/bin/pve-autosnap all 3 --tag=MONTLY 2>&1 | logger -t autosnap-monthly
 ```
 
 ## License

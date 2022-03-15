@@ -20,10 +20,10 @@
 # pve definitions
 # ----------------------------------------------------------------------------
 
-pve_kvm_manager="/usr/sbin/qm"
-pve_lxc_manager="/usr/sbin/pct"
-pve_minvmid="100"
-pve_maxvmid="9999"
+pve_kvm_manager='/usr/sbin/qm'
+pve_lxc_manager='/usr/sbin/pct'
+pve_minvmid='100'
+pve_maxvmid='9999'
 
 # ----------------------------------------------------------------------------
 # kvm/lxc manager definitions
@@ -31,30 +31,32 @@ pve_maxvmid="9999"
 
 kvm_manager="${pve_kvm_manager}"
 lxc_manager="${pve_lxc_manager}"
-cmd_status="status"
-cmd_list_vm="list"
-cmd_list_snapshot="listsnapshot"
-cmd_create_snapshot="snapshot"
-cmd_delete_snapshot="delsnapshot"
+cmd_status='status'
+cmd_list_vm='list'
+cmd_list_snapshot='listsnapshot'
+cmd_create_snapshot='snapshot'
+cmd_delete_snapshot='delsnapshot'
 
 # ----------------------------------------------------------------------------
 # program options
 # ----------------------------------------------------------------------------
 
-opt_vmid="help"
-opt_keep="1"
+opt_vmid='help'
+opt_keep='1'
 opt_minvmid="${pve_minvmid}"
 opt_maxvmid="${pve_maxvmid}"
-opt_exclude=""
-opt_include=""
-opt_help="no"
-opt_debug="no"
+opt_exclude=''
+opt_include=''
+opt_prefix='AUTOSNAP'
+opt_tag='not-set'
+opt_help='no'
+opt_debug='no'
 
 # ----------------------------------------------------------------------------
 # get the program name
 # ----------------------------------------------------------------------------
 
-if [ "no${0}ne" != "none" ]
+if [ "no${0}ne" != 'none' ]
 then
     pve_autosnap="${0}"
 else
@@ -65,11 +67,11 @@ fi
 # parse the <vmid> positional parameter
 # ----------------------------------------------------------------------------
 
-if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
+if [ "${#}" -gt '0' ] && [ "no${1}ne" != 'none' ]
 then
     case "${1}" in
         --help)
-            opt_help="yes"
+            opt_help='yes'
             shift
             ;;
         [0-9]* | all | none | help)
@@ -87,11 +89,11 @@ fi
 # parse the <keep> positional parameter
 # ----------------------------------------------------------------------------
 
-if [ "${#}" -gt "0" ] && [ "no${1}ne" != "none" ]
+if [ "${#}" -gt '0' ] && [ "no${1}ne" != 'none' ]
 then
     case "${1}" in
         --help)
-            opt_help="yes"
+            opt_help='yes'
             shift
             ;;
         [0-9]*)
@@ -109,14 +111,14 @@ fi
 # parse the command-line otions
 # ----------------------------------------------------------------------------
 
-while [ "${#}" -gt "0" ]
+while [ "${#}" -gt '0' ]
 do
     case "${1}" in
         *=*)
             arg_value="$(expr "${1}" : '[^=]*=\(.*\)')"
             ;;
         *)
-            arg_value=""
+            arg_value=''
             ;;
     esac
     case "${1}" in
@@ -132,20 +134,20 @@ do
         --include=*)
             opt_include="$(echo "${arg_value}" | tr ',' ' ')"
             ;;
+        --tag=*)
+            opt_tag="$(echo "${arg_value}" | tr '[[:blank:]]' '_')"
+            ;;
         --kvm-manager=*)
             kvm_manager="${arg_value}"
             ;;
         --lxc-manager=*)
             lxc_manager="${arg_value}"
             ;;
-        --tag=*)
-            opt_tag="${arg_value}"
-            ;;
         --help)
-            opt_help="yes"
+            opt_help='yes'
             ;;
         --debug)
-            opt_debug="yes"
+            opt_debug='yes'
             ;;
         --debug=*)
             opt_debug="${arg_value}"
@@ -162,7 +164,7 @@ done
 # display help if requested
 # ----------------------------------------------------------------------------
 
-if [ "${opt_help}" = "yes" ] || [ "${opt_vmid}" = "help" ]
+if [ "${opt_help}" = 'yes' ] || [ "${opt_vmid}" = 'help' ]
 then
     cat << ____EOF
 Usage: $(basename ${pve_autosnap}) [ help | <vmid> [ <keep> [OPTIONS] ] ]
@@ -179,7 +181,7 @@ Options:
     --maxvmid={vmid}            specifies the last vmid (default is 9999)
     --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
     --include={vmid,vmid,...}   specifies the list of vmid to include
-    --tag={tag}                 specifies a tag (snapshots will be named "AUTOSNAP_${tag}_$(date '+%Y%m%d_%H%M%S')")
+    --tag={tag}                 specifies an optional snapshot tag (snapshots will be named "AUTOSNAP_{tag}_YYYYMMDD_HHMMSS")
 
 PVE options:
 
@@ -199,7 +201,7 @@ fi
 # enable the debug mode if requested
 # ----------------------------------------------------------------------------
 
-if [ "${opt_debug}" = "yes" ]
+if [ "${opt_debug}" = 'yes' ]
 then
     set -x
 fi
@@ -208,7 +210,7 @@ fi
 # verify the <keep> argument
 # ----------------------------------------------------------------------------
 
-if [ "${opt_keep}" -ge "0" ]
+if [ "${opt_keep}" -ge '0' ]
 then
     : # no-op
 else
@@ -246,7 +248,7 @@ fi
 # verify the '--exclude={vmid,vmid,...}' option
 # ----------------------------------------------------------------------------
 
-if [ "no${opt_exclude}ne" != "none" ]
+if [ "${opt_exclude:-not-set}" != 'not-set' ]
 then
     for excluded_vm in ${opt_exclude}
     do
@@ -265,7 +267,7 @@ fi
 # verify the '--include={vmid,vmid,...}' option
 # ----------------------------------------------------------------------------
 
-if [ "no${opt_include}ne" != "none" ]
+if [ "${opt_include:-not-set}" != 'not-set' ]
 then
     for included_vm in ${opt_include}
     do
@@ -284,7 +286,7 @@ fi
 # verify the '--kvm-manager={path}' option
 # ----------------------------------------------------------------------------
 
-if [ "no${kvm_manager}ne" != "none" ] && [ -x "${kvm_manager}" ]
+if [ "${kvm_manager:-not-set}" != 'not-set' ] && [ -x "${kvm_manager}" ]
 then
     : # no-op
 else
@@ -296,7 +298,7 @@ fi
 # verify the '--lxc-manager={path}' option
 # ----------------------------------------------------------------------------
 
-if [ "no${lxc_manager}ne" != "none" ] && [ -x "${lxc_manager}" ]
+if [ "${lxc_manager:-not-set}" != 'not-set' ] && [ -x "${lxc_manager}" ]
 then
     : # no-op
 else
@@ -308,27 +310,27 @@ fi
 # if the given <vmid> is 'all', process vmids with the exclude list then exit
 # ----------------------------------------------------------------------------
 
-if [ "${opt_vmid}" = "all" ]
+if [ "${opt_vmid}" = 'all' ]
 then
     kvm_list="$(${kvm_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
     lxc_list="$(${lxc_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
     vmid_list="${kvm_list} ${lxc_list}"
     for vmid in ${vmid_list}
     do
-        is_excluded="no"
+        is_excluded='no'
         for excluded_vm in ${opt_exclude}
         do
             if [ "${vmid}" -eq "${excluded_vm}" ]
             then
-                is_excluded="yes"
+                is_excluded='yes'
                 break
             fi
         done
-        if [ "${is_excluded}" = "no" ] \
+        if [ "${is_excluded}" = 'no' ] \
         && [ "${vmid}" -ge "${opt_minvmid}" ] \
         && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
-            ${pve_autosnap} "${vmid}" "${opt_keep}"
+            ${pve_autosnap} "${vmid}" "${opt_keep}" --tag="${opt_tag}"
         fi
     done
     exit 0
@@ -338,27 +340,27 @@ fi
 # if the given <vmid> is 'none', process vmids with the include list then exit
 # ----------------------------------------------------------------------------
 
-if [ "${opt_vmid}" = "none" ]
+if [ "${opt_vmid}" = 'none' ]
 then
     kvm_list="$(${kvm_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
     lxc_list="$(${lxc_manager} "${cmd_list_vm}" | grep -v VMID | awk '{ print $1 }')"
     vmid_list="${kvm_list} ${lxc_list}"
     for vmid in ${vmid_list}
     do
-        is_included="no"
+        is_included='no'
         for included_vm in ${opt_include}
         do
             if [ "${vmid}" -eq "${included_vm}" ]
             then
-                is_included="yes"
+                is_included='yes'
                 break
             fi
         done
-        if [ "${is_included}" = "yes" ] \
+        if [ "${is_included}" = 'yes' ] \
         && [ "${vmid}" -ge "${opt_minvmid}" ] \
         && [ "${vmid}" -le "${opt_maxvmid}" ]
         then
-            ${pve_autosnap} "${vmid}" "${opt_keep}"
+            ${pve_autosnap} "${vmid}" "${opt_keep}" --tag="${opt_tag}"
         fi
     done
     exit 0
@@ -370,17 +372,17 @@ fi
 
 echo "=== $(basename ${pve_autosnap}) ${opt_vmid} ${opt_keep} ==="
 
-vm_status=""
-vm_manager=""
+vm_status=''
+vm_manager=''
 
 # ----------------------------------------------------------------------------
 # check if this is a valid kvm vmid
 # ----------------------------------------------------------------------------
 
-if [ "no${vm_manager}ne" = "none" ]
+if [ "${vm_manager:-not-set}" = 'not-set' ]
 then
     vm_status="$(${kvm_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)"
-    if [ "no${vm_status}ne" != "none" ]
+    if [ "${vm_status:-not-set}" != 'not-set' ]
     then
         vm_manager="${kvm_manager}"
     fi
@@ -390,10 +392,10 @@ fi
 # check if this is a valid lxc vmid
 # ----------------------------------------------------------------------------
 
-if [ "no${vm_manager}ne" = "none" ]
+if [ "${vm_manager:-not-set}" = 'not-set' ]
 then
     vm_status="$(${lxc_manager} "${cmd_status}" "${opt_vmid}" 2>/dev/null)"
-    if [ "no${vm_status}ne" != "none" ]
+    if [ "${vm_status:-not-set}" != 'not-set' ]
     then
         vm_manager="${lxc_manager}"
     fi
@@ -403,7 +405,7 @@ fi
 # check if this is a valid vmid
 # ----------------------------------------------------------------------------
 
-if [ "no${vm_manager}ne" = "none" ]
+if [ "${vm_manager:-not-set}" = 'not-set' ]
 then
     echo "error: <vmid> does not look like a valid VM ID"
     exit 1
@@ -413,15 +415,17 @@ fi
 # create new snapshot for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_prefix="AUTOSNAP"
-if [ ! -z ${opt_tag:+x} ]
+if [ "${opt_tag:-not-set}" != 'not-set' ]
 then
-    autosnap_prefix="${autosnap_prefix}_${opt_tag}"
+    autosnap_prefix="${opt_prefix}_${opt_tag}"
+else
+    autosnap_prefix="${opt_prefix}"
 fi
+
 autosnap_name="${autosnap_prefix}_$(date '+%Y%m%d_%H%M%S')"
 autosnap_desc="automatic snapshot"
 
-if [ "${opt_keep}" -gt "0" ]
+if [ "${opt_keep}" -gt '0' ]
 then
     ${vm_manager} "${cmd_create_snapshot}" "${opt_vmid}" "${autosnap_name}" -description "${autosnap_desc}"
 fi
@@ -430,7 +434,7 @@ fi
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i -E '^'${autosnap_prefix}'_([[:digit:]]+_{1}[[:digit:]]+\s.*)$' | awk '{ print $1 }' | sort)"
+autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i "^${autosnap_prefix}_[0-9]\{8\}_[0-9]\{6\} .*$" | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
 
 for autosnap_item in ${autosnap_list}
