@@ -138,6 +138,9 @@ do
         --lxc-manager=*)
             lxc_manager="${arg_value}"
             ;;
+        --tag=*)
+            opt_tag="${arg_value}"
+            ;;
         --help)
             opt_help="yes"
             ;;
@@ -176,6 +179,7 @@ Options:
     --maxvmid={vmid}            specifies the last vmid (default is 9999)
     --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
     --include={vmid,vmid,...}   specifies the list of vmid to include
+    --tag={tag}                 specifies a tag (snapshots will be named "AUTOSNAP_${tag}_$(date '+%Y%m%d_%H%M%S')")
 
 PVE options:
 
@@ -409,7 +413,12 @@ fi
 # create new snapshot for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_name="AUTOSNAP_$(date '+%Y%m%d_%H%M%S')"
+autosnap_prefix="AUTOSNAP"
+if [ ! -z ${opt_tag:+x} ]
+then
+    autosnap_prefix="${autosnap_prefix}_${opt_tag}"
+fi
+autosnap_name="${autosnap_prefix}_$(date '+%Y%m%d_%H%M%S')"
 autosnap_desc="automatic snapshot"
 
 if [ "${opt_keep}" -gt "0" ]
@@ -421,7 +430,7 @@ fi
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i "^AUTOSNAP_" | awk '{ print $1 }' | sort)"
+autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i "^${autosnap_prefix}_" | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
 
 for autosnap_item in ${autosnap_list}
