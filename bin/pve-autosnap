@@ -430,7 +430,7 @@ fi
 # delete old snapshots for this vmid
 # ----------------------------------------------------------------------------
 
-autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i "^${autosnap_prefix}_" | awk '{ print $1 }' | sort)"
+autosnap_list="$(${vm_manager} "${cmd_list_snapshot}" "${opt_vmid}" | sed -e 's/^.*`-> //' | grep -i -E '^'${autosnap_prefix}'_([[:digit:]]+_{1}[[:digit:]]+\s.*)$' | awk '{ print $1 }' | sort)"
 autosnap_left="$(echo "${autosnap_list}" | wc -w)"
 
 for autosnap_item in ${autosnap_list}
