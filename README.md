@@ -168,7 +168,7 @@ Example for 30 daily snapshots:
 Example for 3 monthly snapshots:
 
 ```crontab
-0 0 1 * * /usr/local/bin/pve-autosnap all 3 --tag=MONTLY 2>&1 | logger -t autosnap-monthly
+0 0 1 * * /usr/local/bin/pve-autosnap all 3 --tag=MONTHLY 2>&1 | logger -t autosnap-monthly
 ```
 
 ## License
