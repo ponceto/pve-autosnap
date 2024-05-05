@@ -1,14 +1,14 @@
-# Automatic snapshots for Proxmox VE
+# AUTOMATIC SNAPSHOTS FOR PROXMOX VE
 
-## Abstract
+## ABSTRACT
 
 `pve-autosnap` is a utility script for the [Proxmox VE](https://www.proxmox.com) hypervisor that allows to perform automatic snapshots with a rotating snapshot feature.
 
-## Description
+## DESCRIPTION
 
 This script will help you to perform automatic rotated snapshots.
 
-## Installation
+## INSTALLATION
 
 Clone the repository in the `/opt/pve-autosnap` directory on your PVE node:
 
@@ -23,7 +23,7 @@ cd /usr/local/bin
 ln -sf ../../../opt/pve-autosnap/bin/pve-autosnap ./pve-autosnap
 ```
 
-## Usage
+## USAGE
 
 ```
 Usage: pve-autosnap [ help | <vmid> [ <keep> [OPTIONS] ] ]
@@ -53,7 +53,7 @@ Special options:
     --debug[={yes|no}]          enable/disable the debug mode
 ```
 
-## Examples
+## EXAMPLES
 
 Perform a snapshot for the vmid #500 and keep one snapshot
 
@@ -121,7 +121,7 @@ Perform no snapshot and clean all snapshot for vmid #500
 pve-autosnap 500 0
 ```
 
-## Automated snapshots
+## AUTOMATED SNAPSHOTS
 
 To add a periodic task to perform automated snapshots, just edit your crontab.
 
@@ -149,7 +149,7 @@ Yet another example:
 5 */4 * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
 ```
 
-## Tagging snapshots
+## TAGGING SNAPSHOTS
 
 Snapshot tagging will allow you to create multiple cron jobs with differents rules, for example hourly, daily, weekly and monthly snapshots:
 
@@ -171,7 +171,7 @@ Example for 3 monthly snapshots:
 0 0 1 * * /usr/local/bin/pve-autosnap all 3 --tag=MONTHLY 2>&1 | logger -t autosnap-monthly
 ```
 
-## License
+## LICENSE
 
 `pve-autosnap` is released under the terms of the GNU General Public License v2.
 
