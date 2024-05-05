@@ -8,19 +8,48 @@
 
 This script will help you to perform automatic rotated snapshots.
 
-## INSTALLATION
+## HOWTO
 
-Clone the repository in the `/opt/pve-autosnap` directory on your PVE node:
+### Install
 
+If you have `make` on your system:
+
+```bash
+make install
 ```
-git clone {repository-url} /opt/pve-autosnap
+
+If you don't have `make` on your system:
+
+```bash
+./utils/install.sh
 ```
 
-Then create a symbolic link into the `/usr/local/bin` directory:
+### Uninstall
 
+If you have `make` on your system:
+
+```bash
+make uninstall
 ```
-cd /usr/local/bin
-ln -sf ../../../opt/pve-autosnap/bin/pve-autosnap ./pve-autosnap
+
+If you don't have `make` on your system:
+
+```bash
+./utils/uninstall.sh
+```
+
+### Build Debian package
+
+If you have `make` on your system you can build a debian package:
+
+```bash
+make buildpackage
+```
+
+Then you can install the resulting debian package on your target PVE node:
+
+```bash
+apt install ./pve-autosnap_X.X.X-X_amd64.deb
 ```
 
 ## USAGE
@@ -57,67 +86,67 @@ Special options:
 
 Perform a snapshot for the vmid #500 and keep one snapshot
 
-```
+```bash
 pve-autosnap 500
 ```
 
 Perform a snapshot for the vmid #750 and keep two snapshots
 
-```
+```bash
 pve-autosnap 750 2
 ```
 
 Perform a snapshot for each vmid and keep one snapshot
 
-```
+```bash
 pve-autosnap all
 ```
 
 Perform a snapshot for each vmid and keep two snapshots
 
-```
+```bash
 pve-autosnap all 2
 ```
 
 Perform a snapshot for each vmid but the #150 and #300 and keep one snapshot
 
-```
+```bash
 pve-autosnap all 1 --exclude=150,300
 ```
 
 Perform a snapshot just for vmid #200 and #250 and keep two snapshots
 
-```
+```bash
 pve-autosnap none 2 --include=200,250
 ```
 
 Perform a snapshot for each vmid between #1000 and #1999 but the #1500 and keep two snapshots
 
-```
+```bash
 pve-autosnap all 2 --minvmid=1000 --maxvmid=1999 --exclude=1500
 ```
 
 Perform a snapshot for each vmid from #1000 and keep three snapshots
 
-```
+```bash
 pve-autosnap all 3 --minvmid=1000
 ```
 
 Perform a snapshot for each vmid to #1999 and keep three snapshots
 
-```
+```bash
 pve-autosnap all 3 --maxvmid=1999
 ```
 
 Perform no snapshot and clean all snapshot for each vmid
 
-```
+```bash
 pve-autosnap all 0
 ```
 
 Perform no snapshot and clean all snapshot for vmid #500
 
-```
+```bash
 pve-autosnap 500 0
 ```
 
