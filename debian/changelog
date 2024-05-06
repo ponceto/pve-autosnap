@@ -1,5 +1,71 @@
-pve-autosnap (0.0.0-1) unstable; urgency=medium
+pve-autosnap (1.3.0-1) unstable; urgency=medium
 
-  * Initial release
+  * Version 1.3.0
+
+ -- Olivier Poncet <ponceto@free.fr>  Mon, 06 May 2024 00:00:00 +0200
+
+pve-autosnap (1.2.8-1) unstable; urgency=medium
+
+  * Version 1.2.8
+
+ -- Olivier Poncet <ponceto@free.fr>  Tue, 15 Mar 2022 00:00:00 +0200
+
+pve-autosnap (1.2.7-1) unstable; urgency=medium
+
+  * Version 1.2.7
+
+ -- Olivier Poncet <ponceto@free.fr>  Sun, 06 Mar 2022 00:00:00 +0200
+
+pve-autosnap (1.2.6-1) unstable; urgency=medium
+
+  * Version 1.2.6
 
  -- Olivier Poncet <ponceto@free.fr>  Sun, 28 Nov 2021 00:00:00 +0200
+
+pve-autosnap (1.2.5-1) unstable; urgency=medium
+
+  * Version 1.2.5
+
+ -- Olivier Poncet <ponceto@free.fr>  Fri, 26 Nov 2021 00:00:00 +0200
+
+pve-autosnap (1.2.4-1) unstable; urgency=medium
+
+  * Version 1.2.4
+
+ -- Olivier Poncet <ponceto@free.fr>  Sun, 05 Sep 2021 00:00:00 +0200
+
+pve-autosnap (1.2.3-1) unstable; urgency=medium
+
+  * Version 1.2.3
+
+ -- Olivier Poncet <ponceto@free.fr>  Sat, 04 Sep 2021 00:00:00 +0200
+
+pve-autosnap (1.2.2-1) unstable; urgency=medium
+
+  * Version 1.2.2
+
+ -- Olivier Poncet <ponceto@free.fr>  Fri, 02 Sep 2021 00:00:00 +0200
+
+pve-autosnap (1.2.1-1) unstable; urgency=medium
+
+  * Version 1.2.1
+
+ -- Olivier Poncet <ponceto@free.fr>  Tue, 31 Aug 2021 00:00:00 +0200
+
+pve-autosnap (1.2.0-1) unstable; urgency=medium
+
+  * Version 1.2.0
+
+ -- Olivier Poncet <ponceto@free.fr>  Tue, 31 Aug 2021 00:00:00 +0200
+
+pve-autosnap (1.1.0-1) unstable; urgency=medium
+
+  * Version 1.1.0
+
+ -- Olivier Poncet <ponceto@free.fr>  Tue, 31 Aug 2021 00:00:00 +0200
+
+pve-autosnap (1.0.0-1) unstable; urgency=medium
+
+  * Version 1.0.0
+
+ -- Olivier Poncet <ponceto@free.fr>  Mon, 30 Aug 2021 00:00:00 +0200
