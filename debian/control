@@ -1,0 +1,14 @@
+Source: pve-autosnap
+Section: admin
+Priority: optional
+Maintainer: Olivier Poncet <ponceto@free.fr>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+Homepage: https://www.emaxilde.net/
+Rules-Requires-Root: no
+
+Package: pve-autosnap
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Bulk actions for Proxmox VE
+ pve-autosnap is a utility script for the Proxmox VE hypervisor, which is designed to perform automatic snapshots.
