@@ -10,5 +10,5 @@ Rules-Requires-Root: no
 Package: pve-autosnap
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Bulk actions for Proxmox VE
+Description: Automatic snapshots for Proxmox VE
  pve-autosnap is a utility script for the Proxmox VE hypervisor, which is designed to perform automatic snapshots.
