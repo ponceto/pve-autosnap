@@ -39,7 +39,8 @@ cmd_delete_snapshot='delsnapshot'
 # command-line arguments
 # ----------------------------------------------------------------------------
 
-arg_program='pve-autosnap'
+arg_program="${0:-pve-autosnap}"
+arg_basename="$(basename ${arg_program})"
 arg_vmid='help'
 arg_keep='1'
 arg_lower_id="${pve_lower_id}"
@@ -51,15 +52,6 @@ arg_prefix='AUTOSNAP'
 arg_usage='no'
 arg_debug='no'
 arg_error='no'
-
-# ----------------------------------------------------------------------------
-# get the program name
-# ----------------------------------------------------------------------------
-
-if [ "${0:-not-set}" != 'not-set' ]
-then
-    arg_program="${0}"
-fi
 
 # ----------------------------------------------------------------------------
 # parse the <vmid> positional argument
@@ -167,7 +159,7 @@ done
 if [ "${arg_vmid}" = 'help' ] || [ "${arg_usage}" = 'yes' ] || [ "${arg_error}" = 'yes' ]
 then
     cat << ____EOF
-Usage: ${arg_program} [ help | <vmid> [ <keep> [OPTIONS] ] ]
+Usage: ${arg_basename} [ help | <vmid> [ <keep> [OPTIONS] ] ]
 
 Arguments:
 
