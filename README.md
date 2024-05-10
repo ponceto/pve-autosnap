@@ -59,9 +59,9 @@ Usage: pve-autosnap [ help | <vmid> [ <keep> [OPTIONS] ] ]
 
 Arguments:
 
-    help   display this help and exit
-    vmid   specifies the virtual machine id, can be 'all' or 'none'
-    keep   specifies the maximum number of snapshot to keep (default is 1)
+    help                        display this help and exit
+    vmid                        specifies the virtual machine id, can be 'all' or 'none'
+    keep                        specifies the maximum number of snapshot to keep (default is 1)
 
 Options:
 
@@ -71,15 +71,16 @@ Options:
     --include={vmid,vmid,...}   specifies the list of vmid to include
     --tag={tag}                 specifies an optional snapshot tag (snapshots will be named "AUTOSNAP_{tag}_YYYYMMDD_HHMMSS")
 
-PVE options:
-
-    --kvm-manager={path}        specifies the KVM manager ('/usr/sbin/qm')
-    --lxc-manager={path}        specifies the LXC manager ('/usr/sbin/pct')
-
 Special options:
 
     --help                      display this help and exit
     --debug[={yes|no}]          enable/disable the debug mode
+
+Environment variables:
+
+    PVE_CT_MANAGER              ct manager (defaults to pct)
+    PVE_VM_MANAGER              vm manager (defaults to qm)
+
 ```
 
 ## EXAMPLES
