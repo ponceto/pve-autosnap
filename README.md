@@ -65,8 +65,8 @@ Arguments:
 
 Options:
 
-    --minvmid={vmid}            specifies the first vmid (default is 100)
-    --maxvmid={vmid}            specifies the last vmid (default is 9999)
+    --lower-id={vmid}           specifies the lower vmid (default is 100)
+    --upper-id={vmid}           specifies the upper vmid (default is 1000000)
     --exclude={vmid,vmid,...}   specifies the list of vmid to exclude
     --include={vmid,vmid,...}   specifies the list of vmid to include
     --tag={tag}                 specifies an optional snapshot tag (snapshots will be named "AUTOSNAP_{tag}_YYYYMMDD_HHMMSS")
