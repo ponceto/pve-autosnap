@@ -23,7 +23,7 @@
 pve_kvm_manager='/usr/sbin/qm'
 pve_lxc_manager='/usr/sbin/pct'
 pve_minvmid='100'
-pve_maxvmid='9999'
+pve_maxvmid='1000000'
 
 # ----------------------------------------------------------------------------
 # kvm/lxc manager definitions
