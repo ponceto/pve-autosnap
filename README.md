@@ -10,7 +10,17 @@ This script will help you to perform automatic rotated snapshots.
 
 ## HOWTO
 
-### Install
+### Debian install (recommended)
+
+The preferred method to install `pve-autosnap` is by using the Debian package. It is recommended to download the Debian package into `/tmp`.
+
+```bash
+cd /tmp
+wget <url of the debian package>
+apt install ./pve-autosnap_X.X.X-X_amd64.deb
+```
+
+### Manual install
 
 If you have `make` on your system:
 
@@ -24,7 +34,7 @@ If you don't have `make` on your system:
 ./utils/install.sh
 ```
 
-### Uninstall
+### Manual uninstall
 
 If you have `make` on your system:
 
@@ -38,7 +48,7 @@ If you don't have `make` on your system:
 ./utils/uninstall.sh
 ```
 
-### Build Debian package
+### Build the Debian package
 
 If you have `make` on your system you can build a debian package:
 
@@ -46,11 +56,7 @@ If you have `make` on your system you can build a debian package:
 make buildpackage
 ```
 
-Then you can install the resulting debian package on your target PVE node:
-
-```bash
-apt install ./pve-autosnap_X.X.X-X_amd64.deb
-```
+Then you can install the resulting debian package on your target PVE node.
 
 ## USAGE
 
@@ -158,25 +164,27 @@ To add a periodic task to perform automated snapshots, just edit your crontab.
 It is recommended to redirect `stderr` to `stdout` and pipe the result to the
 `logger` utility in order to send the resulting logs to the local syslog service.
 
+Note: Here we will assume you have installed the Debian package, so `pve-autosnap` will reside in `/usr/bin`.
+
 Example:
 
 ```crontab
 # automatic snapshot for vmid #100, every 30m, and keep the last 3 snapshots
-*/30 * * * * /usr/local/bin/pve-autosnap 100 3 2>&1 | logger -t autosnap
+*/30 * * * * /usr/bin/pve-autosnap 100 3 2>&1 | logger -t autosnap
 ```
 
 Another example:
 
 ```crontab
 # automatic snapshot for all vm, at minute 0, every 1h, and keep the last 2 snapshots
-0 * * * * /usr/local/bin/pve-autosnap all 2 2>&1 | logger -t autosnap
+0 * * * * /usr/bin/pve-autosnap all 2 2>&1 | logger -t autosnap
 ```
 
 Yet another example:
 
 ```crontab
 # automatic snapshot for all vm, at minute 5, every 4h, and keep the last 1 snapshot
-5 */4 * * * /usr/local/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
+5 */4 * * * /usr/bin/pve-autosnap all 1 2>&1 | logger -t autosnap
 ```
 
 ## TAGGING SNAPSHOTS
@@ -186,19 +194,19 @@ Snapshot tagging will allow you to create multiple cron jobs with differents rul
 Example for 48 hourly snapshots:
 
 ```crontab
-0 * * * * /usr/local/bin/pve-autosnap all 48 --tag=HOURLY 2>&1 | logger -t autosnap-hourly
+0 * * * * /usr/bin/pve-autosnap all 48 --tag=HOURLY 2>&1 | logger -t autosnap-hourly
 ```
 
 Example for 30 daily snapshots:
 
 ```crontab
-0 0 * * * /usr/local/bin/pve-autosnap all 30 --tag=DAILY 2>&1 | logger -t autosnap-daily
+0 0 * * * /usr/bin/pve-autosnap all 30 --tag=DAILY 2>&1 | logger -t autosnap-daily
 ```
 
 Example for 3 monthly snapshots:
 
 ```crontab
-0 0 1 * * /usr/local/bin/pve-autosnap all 3 --tag=MONTHLY 2>&1 | logger -t autosnap-monthly
+0 0 1 * * /usr/bin/pve-autosnap all 3 --tag=MONTHLY 2>&1 | logger -t autosnap-monthly
 ```
 
 ## LICENSE
